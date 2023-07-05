@@ -5,6 +5,9 @@ on:
   pull_request:
     branches:
       - main
+  delete:
+    branches-ignore:
+      - main
   workflow_dispatch:
 
 concurrency:
