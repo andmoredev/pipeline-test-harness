@@ -25,11 +25,21 @@ jobs:
     outputs:
       BRANCH_NAME: ${{ steps.branch-name.outputs.BRANCH_NAME }}
     steps:
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ vars.PIPELINE_EXECUTION_ROLE }}
+          role-session-name: get-api-base-url
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
       - id: branch-name
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           VAR_3: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
         run: |
+          url=$(aws cloudformation describe-stacks --stack-name electronic-discovery-service-$VAR_1)
+          echo "Hello $url"
           echo "var1 -> $VAR_1"
           echo "var2 -> $VAR_2"
           echo "var3 -> $VAR_3"
