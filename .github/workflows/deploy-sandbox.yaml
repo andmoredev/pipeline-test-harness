@@ -21,9 +21,12 @@ jobs:
       BRANCH_NAME: ${{ steps.branch-name.outputs.BRANCH_NAME }}
     steps:
       - id: branch-name
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
           echo "var 2 --- ${{ github.ref_name }}"
+          echo "$GITHUB_CONTEXT"
 
           REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
           REPLACE_STRING="refs/heads/"
