@@ -4,7 +4,10 @@ run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to
 on:
   pull_request:
     branches:
-      - master
+      - main
+  delete:
+    branches-ignore:
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -19,6 +22,9 @@ jobs:
     steps:
       - id: branch-name
         run: |
+          echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
+          echo "var 2 --- ${{ github.ref_name }}"
+
           REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
           REPLACE_STRING="refs/heads/"
           EMPTY_STRING=""
