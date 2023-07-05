@@ -30,24 +30,3 @@ jobs:
 
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
           echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
-
-  cleanup-resources:
-    name: Delete SAM Application
-    needs: [get-branch-name]
-    runs-on: ubuntu-latest
-    environment: DEVELOPMENT
-    steps:
-      - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: us-east-1
-          role-to-assume: ${{ vars.PIPELINE_EXECUTION_ROLE }}
-          role-session-name: cleanup-stack-${{ needs.get-branch-name.outputs.BRANCH_NAME }}
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-      - name: Delete Stack
-        run: |
-          sam delete \
-          --stack-name electronic-discovery-service-${{ needs.get-branch-name.outputs.BRANCH_NAME }} \
-          --region us-east-1 \
-          --no-prompts
