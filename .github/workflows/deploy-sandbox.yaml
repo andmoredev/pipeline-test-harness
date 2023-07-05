@@ -24,6 +24,7 @@ jobs:
         run: |
           echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
           echo "var 2 --- ${{ github.ref_name }}"
+          echo "var 3 --- ${{ github.event }}"
 
           REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
           REPLACE_STRING="refs/heads/"
