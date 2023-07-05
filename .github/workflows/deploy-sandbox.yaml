@@ -13,6 +13,8 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
 
+env:
+  MY_TEST_VAR: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref }}
 jobs:
   get-branch-name:
     name: Get branch name
@@ -24,6 +26,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
+          echo "var 0 $MY_TEST_VAR"
           echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
           echo "var 2 --- ${{ github.ref_name }}"
           echo "$GITHUB_CONTEXT"
