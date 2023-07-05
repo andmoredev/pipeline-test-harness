@@ -1,0 +1,53 @@
+name: Cleanup Sandbox
+run-name: Cleanup ${{ github.ref_name }} Sandbox
+
+on:
+  delete:
+    branches-ignore:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.ref || github.ref }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  get-branch-name:
+    name: Get branch name
+    runs-on: ubuntu-latest
+    outputs:
+      BRANCH_NAME: ${{ steps.branch-name.outputs.BRANCH_NAME }}
+    steps:
+      - id: branch-name
+        run: |
+          REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
+          REPLACE_STRING="refs/heads/"
+          EMPTY_STRING=""
+          BRANCH_NAME=$(echo "${REF_VALUE/"$REPLACE_STRING"/"$EMPTY_STRING"}")
+
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
+
+  cleanup-resources:
+    name: Delete SAM Application
+    needs: [get-branch-name]
+    runs-on: ubuntu-latest
+    environment: DEVELOPMENT
+    steps:
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ vars.PIPELINE_EXECUTION_ROLE }}
+          role-session-name: cleanup-stack-${{ needs.get-branch-name.outputs.BRANCH_NAME }}
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+      - name: Delete Stack
+        run: |
+          sam delete \
+          --stack-name electronic-discovery-service-${{ needs.get-branch-name.outputs.BRANCH_NAME }} \
+          --region us-east-1 \
+          --no-prompts

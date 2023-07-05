@@ -1,0 +1,23 @@
+[AllowList]
+  Files = [
+  "api\\.html",
+  "fake-private-key\\.json",
+]
+Paths = []
+Regexes = [
+  "https://qa-discovery.tylerapp.com/api",
+  "https://m79hnphg0k.execute-api.us-gov-west-1.amazonaws.com/test",
+  "\\$util\\.urlEncode\\(\\$input\\.json\\('\\$\\.LastEvaluatedKey'\\)\\)",
+  "execute-api.us-gov-west-1.amazonaws.com/prod",
+  "AUTHENTICATION_URL = 'https://api\\.box\\.com/oauth2/token'",
+  "\\$\\.prosecutors\\.LastEvaluatedKey",
+  "TOKEN_TABLE_NAME: '\\{\\{resolve:ssm:PlatformTokenTableName\\}\\}'",
+  "Token\\.split\\('\\.'\\)\\[1\\], 'base64'\\)\\.toString\\(\\)\\)\\.scp\\.includes\\('tyl:test'",
+  "\\$\\.defendants\\.LastEvaluatedKey",
+  "\\$\\.submissions\\.LastEvaluatedKey",
+  "\\$\\.pageToken\\.LastEvaluatedKey",
+  "\\$\\.submission\\.Item\\.data\\.M\\.snapshotObjectKey\\.S",
+  "\\$\\.submission\\.snapshotObjectKey",
+  "Key=='SeedBoxStepFunctionArn'\\]\\.OutputValue\"",
+  "Key=='SeedBoxStepFunctionArn'\\]\\.OutputValue\"",
+]

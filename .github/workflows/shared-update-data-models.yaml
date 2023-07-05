@@ -1,0 +1,40 @@
+name: Update Data Model Schema Documentation
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  update-data-model-schema-docs:
+    name: Update Data Model Schema Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+      - name: Configure NPM
+        env:
+          NPM_ARTIFACTORY_AUTH: ${{ secrets.SCRATCH_ARTIFACTORY_TOKEN }}
+        run: |
+          npm config set registry https://tylertech.jfrog.io/tylertech/api/npm/npm
+          npm config set //tylertech.jfrog.io/tylertech/api/npm/:_auth "$NPM_ARTIFACTORY_AUTH"
+      - name: Run Tools
+        run: |
+          npm install
+          rm -rf docs/data-model/schemas/*
+          npm run copy-and-resolve-data-models
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "GitHub Actions Bot"
+            git config user.email "<>"
+            git add "docs/data-model/schemas" -f
+            git commit -m "[skip ci] Update Data Model Schema Documentation"
+            git push
+          else
+            echo "no changes";
+          fi
