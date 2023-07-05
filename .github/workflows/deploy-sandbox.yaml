@@ -1,134 +1,28 @@
 name: Deploy Sandbox
-run-name: Deploy ${{ github.ref_name }} to Sandbox
+run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to Sandbox
 
 on:
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name }}
-
-permissions:
-  id-token: write
-  contents: read
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
 
 jobs:
-  lint:
-    name: Lint
-    uses: ./.github/workflows/shared-lint.yaml
-    secrets: inherit
-
-  unit-tests:
-    name: Unit Tests
-    uses: ./.github/workflows/shared-unit-tests.yaml
-    secrets: inherit
-
-  deploy-stacks:
-    name: Deploy stacks
-    needs: [lint, unit-tests]
-    uses: ./.github/workflows/shared-sam-build-and-deploy.yaml
-    with:
-      WORKFLOW_ENV: DEVELOPMENT
-      AWS_REGION: us-east-1
-      USER_SERVICE_API_URL: https://qa-cloud-services.tylerapp.com/api/user-service
-      DATA_BOUNDARY_SERVICE_API_URL:  https://qa-cloud-services.tylerapp.com/api/data-boundary-service
-      STACK_NAME: electronic-discovery-service-${{ github.ref_name }}
-      TABLE_NAME: electronic-discovery-${{ github.ref_name }}
-      NAME_COLISSION_SUFFIX: ${{ github.ref_name }}
-    secrets: inherit
-
-  update-policy:
-    name: Update Policy
-    needs: [deploy-stacks]
+  get-branch-name:
+    name: Get branch name
     runs-on: ubuntu-latest
-    environment: DEVELOPMENT
-    steps:
-      - uses: actions/checkout@v3
-      - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: us-east-1
-          role-to-assume: ${{ vars.PIPELINE_EXECUTION_ROLE }}
-          role-session-name: discovery-update-policy
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-      - name: Update Policy
-        uses: tyler-technologies/cj-jpp-build-authorizer-policy-action@master
-        with:
-          oasFileName: ./schemas/openapi.yaml
-          tableName: electronic-discovery-${{ github.ref_name }}
-
-  get-api-base-url:
-    name: Get API Base Url
-    needs: [deploy-stacks]
-    runs-on: ubuntu-latest
-    environment: DEVELOPMENT
     outputs:
-      BASE_URL: ${{ steps.getUrl.outputs.BASE_URL }}
+      BRANCH_NAME: ${{ steps.branch-name.outputs.BRANCH_NAME }}
     steps:
-      - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: us-east-1
-          role-to-assume: ${{ vars.PIPELINE_EXECUTION_ROLE }}
-          role-session-name: get-api-base-url
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-      - id: getUrl
-        name: Get Url
+      - id: branch-name
         run: |
-          url=$(aws cloudformation describe-stacks --stack-name electronic-discovery-service-${{ github.ref_name }} --query "Stacks[0].Outputs[?OutputKey=='ApiURL'].OutputValue" --output text)
-          echo "BASE_URL=$url" >> $GITHUB_OUTPUT
-          echo "### API Url $url" >> $GITHUB_STEP_SUMMARY
+          REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
+          REPLACE_STRING="refs/heads/"
+          EMPTY_STRING=""
+          BRANCH_NAME=$(echo "${REF_VALUE/"$REPLACE_STRING"/"$EMPTY_STRING"}")
 
-  seed-box-folders:
-    name: Seed Box Folders
-    needs: [deploy-stacks]
-    runs-on: ubuntu-latest
-    environment: DEVELOPMENT
-    steps:
-      - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-region: us-east-1
-          role-to-assume: ${{ vars.PIPELINE_EXECUTION_ROLE }}
-          role-session-name: seed-box-folers
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-      - run: |
-          stepFunctionArn=$(aws cloudformation describe-stacks --stack-name electronic-discovery-service-${{ github.ref_name }} --query "Stacks[0].Outputs[?OutputKey=='SeedBoxStepFunctionArn'].OutputValue" --output text)
-          year=$(date +%Y)
-          month=$(date +%m)
-          aws stepfunctions start-sync-execution --state-machine-arn $stepFunctionArn  --input "{\"tenantId\":\"TYLERTECHNOLOGIES-ediscovery\",\"product\":\"ediscovery\",\"years\":[\"$year\"],\"months\":[\"$month\"]}"
-
-  test-api:
-    name: Test API
-    needs: [get-api-base-url, update-policy, seed-box-folders]
-    uses: ./.github/workflows/shared-test-api.yaml
-    with:
-      WORKFLOW_ENV: DEVELOPMENT
-      BASE_URL: ${{ needs.get-api-base-url.outputs.BASE_URL }}
-    secrets: inherit
-
-  run-security-tests:
-    name: Run Security Tests
-    needs: [get-api-base-url, update-policy, seed-box-folders]
-    runs-on: ubuntu-latest
-    environment: DEVELOPMENT
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          cache: 'npm'
-      - name: Security Tests
-        env:
-          ENV: DEVELOPMENT
-          NPM_ARTIFACTORY_AUTH: ${{ secrets.SCRATCH_ARTIFACTORY_TOKEN }}
-          OKTA_AUTH_SERVER_URL: ${{ vars.TEST_OKTA_AUTH_SERVER_URL }}
-          OKTA_AUTH_CLIENT_ID: ${{ vars.TEST_OKTA_AUTH_CLIENT_ID }}
-          OKTA_AUTH_CLIENT_SECRET: ${{ secrets.TEST_OKTA_AUTH_CLIENT_SECRET }}
-          BASE_URL: ${{ needs.get-api-base-url.outputs.BASE_URL }}
-        run: |
-          npm config set registry https://tylertech.jfrog.io/tylertech/api/npm/npm
-          npm config set //tylertech.jfrog.io/tylertech/api/npm/:_auth "$NPM_ARTIFACTORY_AUTH"
-          npm ci
-          node tools/security-tests/index.js
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
