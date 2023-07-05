@@ -14,28 +14,22 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
 
 env:
-  MY_TEST_VAR: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
+  VAR_1: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
 
 jobs:
   get-branch-name:
     name: Get branch name
     runs-on: ubuntu-latest
+    env:
+      VAR_2: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
     outputs:
       BRANCH_NAME: ${{ steps.branch-name.outputs.BRANCH_NAME }}
     steps:
       - id: branch-name
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+          VAR_3: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
         run: |
-          echo "var 0 $MY_TEST_VAR"
-          echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
-          echo "var 2 --- ${{ github.ref_name }}"
-          echo "var 3 ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}"
-
-          REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
-          REPLACE_STRING="refs/heads/"
-          EMPTY_STRING=""
-          BRANCH_NAME=$(echo "${REF_VALUE/"$REPLACE_STRING"/"$EMPTY_STRING"}")
-
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "var1 -> $VAR_1"
+          echo "var2 -> $VAR_2"
+          echo "var3 -> $VAR_3"
