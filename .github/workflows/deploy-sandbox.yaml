@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 env:
-  VAR_1: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
+  VAR_1: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
 
 jobs:
   get-branch-name:
@@ -41,7 +41,7 @@ jobs:
       - id: branch-name
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-          VAR_3: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
+          VAR_3: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
         run: |
           url=$(aws cloudformation describe-stacks --stack-name electronic-discovery-service-$VAR_1)
           echo "Hello $url"
