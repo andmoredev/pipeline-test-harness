@@ -2,6 +2,8 @@ name: Deploy Sandbox
 run-name: Deploy ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }} to Sandbox
 
 on:
+  schedule:
+    - cron: '39 * * * *'
   pull_request:
     branches:
       - main
@@ -9,8 +11,6 @@ on:
     branches-ignore:
       - main
   workflow_dispatch:
-  schedule:
-    - cron: '34 * * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
