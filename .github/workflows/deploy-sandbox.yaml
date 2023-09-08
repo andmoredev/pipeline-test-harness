@@ -10,7 +10,7 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: '* * * * *'
+    - cron: '34 * * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
