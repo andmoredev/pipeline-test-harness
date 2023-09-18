@@ -16,6 +16,10 @@ concurrency:
 env:
   MY_TEST_VAR: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
 
+permissions:
+  contents: write
+  pull-requests: write
+  
 jobs:
   get-branch-name:
     name: Get branch name
