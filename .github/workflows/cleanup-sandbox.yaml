@@ -1,14 +1,7 @@
 name: Cleanup Sandbox
 
 on:
-  workflow_run:
-    workflows: ["Dependabot Merge"]
-    types:
-      - completed
-
-permissions:
-  contents: write
-  pull-requests: write
+  workflow_call:
 
 jobs:
   cleanup-sandbox:

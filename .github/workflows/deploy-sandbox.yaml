@@ -48,3 +48,9 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     uses: ./.github/workflows/dependabot-merge.yaml
     secrets: inherit
+
+  dependabot-cleanup:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    uses: ./.github/workflows/cleanup-sandbox.yaml
+    secrets: inherit
+
