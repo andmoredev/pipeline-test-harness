@@ -51,6 +51,6 @@ jobs:
 
   dependabot-cleanup:
     if: ${{ github.actor == 'dependabot[bot]' }}
+    needs: [review-and-merge]
     uses: ./.github/workflows/cleanup-sandbox.yaml
     secrets: inherit
-
