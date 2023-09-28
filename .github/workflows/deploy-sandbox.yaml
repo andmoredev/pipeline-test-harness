@@ -44,19 +44,7 @@ jobs:
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
           echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
 
-  dependabot:
-    runs-on: ubuntu-latest
+  review-and-merge:
     if: ${{ github.actor == 'dependabot[bot]' }}
-    steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v1
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Approve a PR
-        run: |
-          gh pr review --approve "$PR_URL"
-          gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    uses: ./.github/workflows/dependabot-merge.yaml
+    secrets: inherit
