@@ -2,6 +2,7 @@ name: Deploy Sandbox
 run-name: Deploy ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }} to Sandbox
 
 on:
+  push:
   pull_request:
     branches:
       - main
