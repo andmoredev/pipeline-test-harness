@@ -1,13 +1,13 @@
 {
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "3.427.0",
-    "@aws-sdk/util-dynamodb": "3.427.0",
-    "puppeteer-core": "21.3.8"
+    "@aws-sdk/client-secrets-manager": "3.507.0",
+    "@aws-sdk/util-dynamodb": "3.507.0",
+    "puppeteer-core": "22.0.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "11.0.2",
-    "eslint": "^8.51.0",
+    "@types/fs-extra": "11.0.4",
+    "eslint": "^8.56.0",
     "eslint-config-google": "^0.14.0",
-    "sinon": "16.1.0"
+    "sinon": "17.0.1"
   }
 }
