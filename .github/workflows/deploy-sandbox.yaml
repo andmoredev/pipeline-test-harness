@@ -29,6 +29,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create Branch & Update File
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
+          git branch coverage-update
+          git checkout coverage-update
+
+          echo "# Hello World" >> README.md
+          git add README.md
+
+          git status
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "[skip ci] Update Data Model Schema Documentation"
+            git push
+          fi
+
       - id: branch-name
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -45,18 +62,6 @@ jobs:
 
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
           echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
-
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-
-          echo "# Hello World" >> README.md
-          git add README.md
-
-          git status
-          if ! git diff-index --quiet HEAD; then
-            git commit -m "[skip ci] Update Data Model Schema Documentation"
-            git push
-          fi
 
   review-and-merge:
     if: ${{ github.actor == 'dependabot[bot]' }}
