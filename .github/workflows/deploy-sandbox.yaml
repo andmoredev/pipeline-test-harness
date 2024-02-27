@@ -1,13 +1,11 @@
 name: Deploy Sandbox
-run-name: Deploy ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }} to Sandbox
+run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to Sandbox
 
 on:
   pull_request:
     branches:
       - main
   delete:
-    branches-ignore:
-      - main
   workflow_dispatch:
 
 concurrency:
@@ -39,3 +37,15 @@ jobs:
 
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
           echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
+
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
+          echo "# Hello World" >> README.md
+          git add README.md
+
+          git status
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "[skip ci] Update Data Model Schema Documentation"
+            git push
+          fi
