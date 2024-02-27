@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: pipeline-test-harness
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Tracing: Active
+    Timeout: 10
+    Runtime: nodejs18.x
+    MemorySize: 128
+    Handler: index.handler
+    Architectures:
+      - arm64
+
+Resources:
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/test-function
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+  TestFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/test-function-2
+      Policies:
+        - AWSLambdaBasicExecutionRole

@@ -1,0 +1,11 @@
+name: Cleanup Sandbox
+
+on:
+  workflow_call:
+
+jobs:
+  cleanup-sandbox:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Hello World"
