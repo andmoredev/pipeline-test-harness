@@ -34,14 +34,14 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
 
-          git branch coverage-update
-          git checkout coverage-update
+          git branch coverage-update-2
+          git checkout coverage-update-2
 
           echo "# Hello World" >> README.md
           git add README.md
 
           git commit -m "[skip ci] Update Data Model Schema Documentation"
-          git push --set-upstream origin coverage-update
+          git push --set-upstream origin coverage-update-2
 
           git pull
           gh pr create --title "Update Code Coverage Reports"
