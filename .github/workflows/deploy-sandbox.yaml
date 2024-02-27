@@ -26,6 +26,9 @@ jobs:
     outputs:
       BRANCH_NAME: ${{ steps.branch-name.outputs.BRANCH_NAME }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - id: branch-name
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
