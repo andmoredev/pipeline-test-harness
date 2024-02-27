@@ -40,11 +40,10 @@ jobs:
           echo "# Hello World" >> README.md
           git add README.md
 
-          git status
-          if ! git diff-index --quiet HEAD; then
-            git commit -m "[skip ci] Update Data Model Schema Documentation"
-            git push --set-upstream origin coverage-update
-          fi
+          git commit -m "[skip ci] Update Data Model Schema Documentation"
+          git push --set-upstream origin coverage-update
+
+          gh pr create --title "Update Code Coverage Reports"
 
       - id: branch-name
         env:
