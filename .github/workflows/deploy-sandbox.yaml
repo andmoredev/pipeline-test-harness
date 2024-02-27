@@ -43,6 +43,7 @@ jobs:
           git commit -m "[skip ci] Update Data Model Schema Documentation"
           git push --set-upstream origin coverage-update
 
+          git pull
           gh pr create --title "Update Code Coverage Reports"
 
       - id: branch-name
