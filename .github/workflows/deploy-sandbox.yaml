@@ -36,18 +36,23 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
 
-          git branch coverage-update-6
-          git checkout coverage-update-6
+          git branch coverage-update-7
+          git checkout coverage-update-7
 
           echo "# Hello World" >> README.md
           git add README.md
 
           git commit -m "[skip ci] Update Data Model Schema Documentation"
-          git push --set-upstream origin coverage-update-6
+          git push --set-upstream origin coverage-update-7
 
           git pull
 
-          gh pr create --title "Update Code Coverage Reports" --body "Update Code Coverage Reports"
+          PR_URL=$(gh pr create --title "Update Code Coverage Reports" --body "Update Code Coverage Reports")
+          echo 'hello'
+          echo $PR_URL
+
+          gh pr review --approve "$PR_URL"
+          gh pr merge --auto --merge "$PR_URL"
 
       - id: branch-name
         env:
