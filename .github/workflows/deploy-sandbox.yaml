@@ -44,7 +44,8 @@ jobs:
           git push --set-upstream origin coverage-update-3
 
           git pull
-          # gh pr create --title "Update Code Coverage Reports"
+
+          gh pr create --title "Update Code Coverage Reports"
 
       - id: branch-name
         env:
