@@ -32,18 +32,19 @@ jobs:
       - name: Create Branch & Update File
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
 
-          git branch coverage-update-10
-          git checkout coverage-update-10
+          git branch coverage-update-11
+          git checkout coverage-update-11
 
           echo "# Hello World" >> README.md
           git add README.md
 
           git commit -m "Update Data Model Schema Documentation"
-          git push --set-upstream origin coverage-update-10
+          git push --set-upstream origin coverage-update-11
 
           git pull
 
@@ -53,6 +54,31 @@ jobs:
 
           # gh pr review --approve "$PR_URL"
           # gh pr merge --auto --merge "$PR_URL"
+
+      # - name: Create Branch & Update File
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     git config user.name "GitHub Actions Bot"
+      #     git config user.email "<>"
+
+      #     git branch coverage-update-11
+      #     git checkout coverage-update-11
+
+      #     echo "# Hello World" >> README.md
+      #     git add README.md
+
+      #     git commit -m "Update Data Model Schema Documentation"
+      #     git push --set-upstream origin coverage-update-11
+
+      #     git pull
+
+      #     PR_URL=$(gh pr create --title "Update Code Coverage Reports" --body "Update Code Coverage Reports")
+      #     echo 'hello'
+      #     echo $PR_URL
+
+      #     # gh pr review --approve "$PR_URL"
+      #     # gh pr merge --auto --merge "$PR_URL"
 
       - id: branch-name
         env:
