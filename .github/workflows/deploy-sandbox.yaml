@@ -3,6 +3,8 @@ run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to
 
 on:
   # push:
+  schedule:
+    - cron: '*/1 * * * *'  # Run every minute
   pull_request:
     branches:
       - main
@@ -31,7 +33,7 @@ jobs:
 
       - name: Create Branch & Update File
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           git config user.name "GitHub Actions Bot"
