@@ -51,6 +51,9 @@ jobs:
           echo 'hello'
           echo $PR_URL
 
+          git config user.name "GitHub Actions Bot - 2"
+          git config user.email "><"
+
           gh pr review --approve "$PR_URL"
           gh pr merge --auto --merge "$PR_URL"
 
