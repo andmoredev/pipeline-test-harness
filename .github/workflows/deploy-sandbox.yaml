@@ -4,7 +4,7 @@ run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to
 on:
   # push:
   schedule:
-    - cron: '*/1 * * * *'  # Run every minute
+    - cron: '* * * * *'  # Run every minute
   pull_request:
     branches:
       - main
