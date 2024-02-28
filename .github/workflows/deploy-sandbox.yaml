@@ -2,7 +2,7 @@ name: Deploy Sandbox
 run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to Sandbox
 
 on:
-  push:
+  # push:
   pull_request:
     branches:
       - main
@@ -51,11 +51,8 @@ jobs:
           echo 'hello'
           echo $PR_URL
 
-          git config user.name "GitHub Actions Bot - 2"
-          git config user.email "><"
-
-          gh pr review --approve "$PR_URL"
-          gh pr merge --auto --merge "$PR_URL"
+          # gh pr review --approve "$PR_URL"
+          # gh pr merge --auto --merge "$PR_URL"
 
       - id: branch-name
         env:
