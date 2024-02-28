@@ -42,7 +42,7 @@ jobs:
           echo "# Hello World" >> README.md
           git add README.md
 
-          git commit -m "[skip ci] Update Data Model Schema Documentation"
+          git commit -m "Update Data Model Schema Documentation"
           git push --set-upstream origin coverage-update-8
 
           git pull
