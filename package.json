@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "3.666.0",
-    "@aws-sdk/util-dynamodb": "3.666.0",
+    "@aws-sdk/client-secrets-manager": "3.667.0",
+    "@aws-sdk/util-dynamodb": "3.667.0",
     "puppeteer-core": "23.5.1"
   },
   "devDependencies": {
