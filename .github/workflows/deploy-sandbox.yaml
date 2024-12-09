@@ -14,6 +14,7 @@ concurrency:
 
 env:
   MY_TEST_VAR: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
+  APP_NAME: test-api
 
 permissions:
   contents: write
@@ -93,6 +94,17 @@ jobs:
           REPLACE_STRING="refs/heads/"
           EMPTY_STRING=""
           BRANCH_NAME=$(echo "PR-${{github.event.number}}")
+          if [[ $BRANCH_NAME =~ ^dependabot\/.* ]]; then
+            stackName="$APP_NAME-PR${{github.event.number}}"
+            echo "STACK_NAME=$stackName" >> $GITHUB_OUTPUT
+            echo "### Stack Name: $stackName" >> $GITHUB_STEP_SUMMARY
+          else
+            branchName=$(echo "$BRANCH_NAME" | tr '.' '_' | tr '/' '_' | tr '[:upper:]' '[:lower:]')
+            branchName="${branchName:0:9}"
+            stackName="$APP_NAME-$branchName"
+            echo "STACK_NAME=$stackName" >> $GITHUB_OUTPUT
+            echo "### Stack Name: $stackName" >> $GITHUB_STEP_SUMMARY
+          fi
 
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
           echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
