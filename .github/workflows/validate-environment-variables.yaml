@@ -1,0 +1,62 @@
+name: Validate Environment Variables
+
+on:
+  push:
+
+jobs:
+  validate-env:
+    runs-on: ubuntu-latest
+    env:
+      EXPECTED_ENV_VARS: "API_KEY,DATABASE_URL,APP_SECRET"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Environment Variables and Secrets
+        run: |
+          echo "### 🛠️ Environment Variable Validation Results" >> $GITHUB_STEP_SUMMARY
+
+          missing_vars=()
+          expected_vars=$(echo "${EXPECTED_ENV_VARS}" | tr ',' ' ')
+
+          for var in $expected_vars; do
+            if [ -z "${!var}" ]; then
+              missing_vars+=("$var")
+            fi
+          done
+
+          if [ ${#missing_vars[@]} -eq 0 ]; then
+            echo "✅ All expected environment variables are set." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Missing environment variables:" >> $GITHUB_STEP_SUMMARY
+            for missing_var in "${missing_vars[@]}"; do
+              echo "- $missing_var" >> $GITHUB_STEP_SUMMARY
+            done
+            exit 1
+          fi
+
+      # - name: Validate Secrets
+      #   env:
+      #     EXPECTED_SECRETS: "GH_TOKEN,DEPLOY_KEY"
+      #   run: |
+      #     echo "### 🔐 Secrets Validation Results" >> $GITHUB_STEP_SUMMARY
+
+      #     missing_secrets=()
+      #     expected_secrets=$(echo "${EXPECTED_SECRETS}" | tr ',' ' ')
+
+      #     for secret in $expected_secrets; do
+      #       if [ -z "${{ secrets[$secret] }}" ]; then
+      #         missing_secrets+=("$secret")
+      #       fi
+      #     done
+
+      #     if [ ${#missing_secrets[@]} -eq 0 ]; then
+      #       echo "✅ All expected secrets are set." >> $GITHUB_STEP_SUMMARY
+      #     else
+      #       echo "❌ Missing secrets:" >> $GITHUB_STEP_SUMMARY
+      #       for missing_secret in "${missing_secrets[@]}"; do
+      #         echo "- $missing_secret" >> $GITHUB_STEP_SUMMARY
+      #       done
+      #       exit 1
+      #     fi
