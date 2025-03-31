@@ -1,0 +1,14 @@
+name: Workflow
+run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to Sandbox
+
+on:
+  workflow_call:
+
+jobs:
+  pre-deployment-validations:
+    name: Pre deployment validations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: |
+          echo "Pre deploy"

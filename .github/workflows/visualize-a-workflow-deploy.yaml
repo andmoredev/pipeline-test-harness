@@ -1,0 +1,14 @@
+name: Workflow
+run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to Sandbox
+
+on:
+  workflow_call:
+
+jobs:
+  deployment:
+    name: Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: |
+          echo "Deploy"

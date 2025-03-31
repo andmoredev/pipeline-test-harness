@@ -1,40 +1,21 @@
-name: Deploy Sandbox
-run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to Sandbox
+name: Workflow
 
 on:
-  # push:
   push:
 
 jobs:
   pre-deployment-validations:
-    name: Pre deployment validations
-    runs-on: ubuntu-latest
-    steps:
-      - name: Echo
-        run: |
-          echo "Pre deploy"
+    uses: ./.github/workflows/visualize-a-workflow-pre.yaml
+    secrets: inherit
 
   deployment:
-    name: Deployment
-    runs-on: ubuntu-latest
-    steps:
-      - name: Echo
-        run: |
-          echo "Deploy"
+    uses: ./.github/workflows/visualize-a-workflow-deploy.yaml
+    secrets: inherit
 
   seed:
-    name: Seed
-    runs-on: ubuntu-latest
-    steps:
-      - name: Seed
-        run: |
-          echo "seed"
+    uses: ./.github/workflows/visualize-a-workflow-seed.yaml
+    secrets: inherit
 
   post-deployment-validations:
-    name: Post deployment validations
-    runs-on: ubuntu-latest
-    steps:
-      - name: Echo
-        run: |
-          echo "Post deploy"
-
+    uses: ./.github/workflows/visualize-a-workflow-post.yaml
+    secrets: inherit
