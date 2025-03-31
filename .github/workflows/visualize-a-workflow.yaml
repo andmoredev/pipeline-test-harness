@@ -19,6 +19,6 @@ jobs:
     secrets: inherit
 
   post-deployment-validations:
-    needs: [pre-deployment-validations]
+    needs: [seed]
     uses: ./.github/workflows/visualize-a-workflow-post.yaml
     secrets: inherit
