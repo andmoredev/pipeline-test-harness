@@ -1,0 +1,40 @@
+name: Deploy Sandbox
+run-name: Deploy ${{ github.event.pull_request.head.ref || github.ref_name }} to Sandbox
+
+on:
+  # push:
+  push:
+
+jobs:
+  pre-deployment-validations:
+    name: Pre deployment validations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: |
+          echo "Pre deploy"
+
+  deployment:
+    name: Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: |
+          echo "Deploy"
+
+  seed:
+    name: Seed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Seed
+        run: |
+          echo "seed"
+
+  post-deployment-validations:
+    name: Post deployment validations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: |
+          echo "Post deploy"
+
