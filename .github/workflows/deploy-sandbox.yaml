@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   get-logical-environment-name:
-    if: ${{ inputs.environment == 'Temporary' }}
+    if: inputs.environment == 'Temporary'
     name: Get Logical Environment
     runs-on: ubuntu-latest
     outputs:
@@ -38,6 +38,7 @@ jobs:
       - name: Extract JIRA number from branch name
         id: get-logical-environment-name
         run: |
+          echo input - ${{ inputs.environment }}
           JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
 
           if [ -z "$JIRA_NUMBER" ]; then
