@@ -8,52 +8,71 @@ on:
       - main
   delete:
   workflow_dispatch:
+    inputs:
+      environment:
+          type: environment
+          description: 'Select the Logical Environment'
+          required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
 
 env:
-  MY_TEST_VAR: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
+  FULL_BRANCH_NAME: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  get-branch-name:
-    name: Get branch name
+  get-logical-environment-name:
+    name: Get Logical Environment
     runs-on: ubuntu-latest
     outputs:
-      BRANCH_NAME: ${{ steps.branch-name.outputs.BRANCH_NAME }}
+      LOGICAL_ENVIRONMENT_NAME: ${{ steps.get-logical-environment-name.outputs.LOGICAL_ENVIRONMENT_NAME }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create Branch & Update File
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Extract JIRA number from branch name
+        id: get-logical-environment-name
         run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
+          JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
 
-          git branch coverage-update-11
-          git checkout coverage-update-11
+          if [ -z "$JIRA_NUMBER" ]; then
+            echo "No JIRA number found, generating random environment name..."
+            JIRA_NUMBER="env-$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c $((RANDOM % 4 + 3)))"
+          fi
 
-          echo "# Hello World" >> README.md
-          git add README.md
+          echo "LOGICAL_ENVIRONMENT_NAME=$JIRA_NUMBER" >> $GITHUB_OUTPUT
+          echo "# BUILD DATA" >> $GITHUB_STEP_SUMMARY
+          echo "* Logical Environment - $JIRA_NUMBER" >> $GITHUB_STEP_SUMMARY
 
-          git commit -m "Update Data Model Schema Documentation"
-          git push --set-upstream origin coverage-update-11
+      # - name: Create Branch & Update File
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     GITHUB_CONTEXT: ${{ toJson(github) }}
+      #   run: |
+      #     git config user.name "GitHub Actions Bot"
+      #     git config user.email "<>"
 
-          git pull
+      #     git branch coverage-update-11
+      #     git checkout coverage-update-11
 
-          PR_URL=$(gh pr create --title "Update Code Coverage Reports" --body "Update Code Coverage Reports")
-          echo 'hello'
-          echo $PR_URL
+      #     echo "# Hello World" >> README.md
+      #     git add README.md
 
-          # gh pr review --approve "$PR_URL"
-          # gh pr merge --auto --merge "$PR_URL"
+      #     git commit -m "Update Data Model Schema Documentation"
+      #     git push --set-upstream origin coverage-update-11
+
+      #     git pull
+
+      #     PR_URL=$(gh pr create --title "Update Code Coverage Reports" --body "Update Code Coverage Reports")
+      #     echo 'hello'
+      #     echo $PR_URL
+
+      #     # gh pr review --approve "$PR_URL"
+      #     # gh pr merge --auto --merge "$PR_URL"
 
       # - name: Create Branch & Update File
       #   env:
@@ -80,30 +99,30 @@ jobs:
       #     # gh pr review --approve "$PR_URL"
       #     # gh pr merge --auto --merge "$PR_URL"
 
-      - id: branch-name
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "var 0 $MY_TEST_VAR"
-          echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
-          echo "var 2 --- ${{ github.ref_name }}"
-          echo "var 3 ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}"
-          echo "var 4 ${{github.event.number}}"
-          REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
-          REPLACE_STRING="refs/heads/"
-          EMPTY_STRING=""
-          BRANCH_NAME=$(echo "PR-${{github.event.number}}")
+      # - id: branch-name
+      #   env:
+      #     GITHUB_CONTEXT: ${{ toJson(github) }}
+      #   run: |
+      #     echo "var 0 $MY_TEST_VAR"
+      #     echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
+      #     echo "var 2 --- ${{ github.ref_name }}"
+      #     echo "var 3 ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}"
+      #     echo "var 4 ${{github.event.number}}"
+      #     REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
+      #     REPLACE_STRING="refs/heads/"
+      #     EMPTY_STRING=""
+      #     BRANCH_NAME=$(echo "PR-${{github.event.number}}")
 
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
+      #     echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+      #     echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
 
-  review-and-merge:
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    uses: ./.github/workflows/dependabot-merge.yaml
-    secrets: inherit
+  # review-and-merge:
+  #   if: ${{ github.actor == 'dependabot[bot]' }}
+  #   uses: ./.github/workflows/dependabot-merge.yaml
+  #   secrets: inherit
 
-  dependabot-cleanup:
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    needs: [review-and-merge]
-    uses: ./.github/workflows/cleanup-sandbox.yaml
-    secrets: inherit
+  # dependabot-cleanup:
+  #   if: ${{ github.actor == 'dependabot[bot]' }}
+  #   needs: [review-and-merge]
+  #   uses: ./.github/workflows/cleanup-sandbox.yaml
+  #   secrets: inherit
