@@ -31,7 +31,7 @@ jobs:
 
       - name: Extract JIRA number from branch name
         run: |
-          JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+')
+          JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
 
           if [ -z "$JIRA_NUMBER" ]; then
             echo "No JIRA number found, generating random environment name..."
