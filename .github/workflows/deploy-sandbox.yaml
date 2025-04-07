@@ -26,6 +26,7 @@ permissions:
 
 jobs:
   get-logical-environment-name:
+    if: ${{ inputs.environment == 'Temporary' }}
     name: Get Logical Environment
     runs-on: ubuntu-latest
     outputs:
