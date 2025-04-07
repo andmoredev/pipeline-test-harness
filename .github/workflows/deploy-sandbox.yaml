@@ -34,7 +34,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract JIRA number from branch name
+      - name: Get Logical Environment Name
         id: get-logical-environment-name
         run: |
           if [ "${{ inputs.environment || 'Temporary' }}" != "Temporary" ]; then
