@@ -28,8 +28,9 @@ jobs:
   get-logical-environment-name:
     name: Get Logical Environment
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'dev-1' }}
     outputs:
-      LOGICAL_ENVIRONMENT_NAME: ${{ steps.get-logical-environment-name.outputs.LOGICAL_ENVIRONMENT_NAME }}
+      LOGICAL_ENV: ${{ steps.get-logical-environment-name.outputs.LOGICAL_ENV }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,8 +39,8 @@ jobs:
         id: get-logical-environment-name
         run: |
           if [ "${{ inputs.environment || 'Temporary' }}" != "Temporary" ]; then
-            LOGICAL_ENVIRONMENT_NAME="${{ inputs.environment }}"
-            echo "Using provided environment: $LOGICAL_ENVIRONMENT_NAME"
+            LOGICAL_ENV="${{ inputs.environment }}"
+            echo "Using provided environment: $LOGICAL_ENV"
           else
             JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
 
@@ -48,18 +49,18 @@ jobs:
               JIRA_NUMBER="env-$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c $((RANDOM % 4 + 3)))"
             fi
 
-            LOGICAL_ENVIRONMENT_NAME="$JIRA_NUMBER"
+            LOGICAL_ENV="$JIRA_NUMBER"
           fi
 
-          echo "LOGICAL_ENVIRONMENT_NAME=$LOGICAL_ENVIRONMENT_NAME" >> $GITHUB_OUTPUT
+          echo "LOGICAL_ENV=$LOGICAL_ENV" >> $GITHUB_ENV
           echo "# BUILD DATA" >> $GITHUB_STEP_SUMMARY
-          echo "* Logical Environment - $LOGICAL_ENVIRONMENT_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "* Logical Environment - $LOGICAL_ENV" >> $GITHUB_STEP_SUMMARY
 
       - name: Check Required Variables
         env:
           AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
           BAND: ${{ vars.BAND }}
-          LOGICAL_ENV: ${{ vars.LOGICAL_ENV }}
+          LOGICAL_ENV: ${{ vars.LOGICAL_ENV || env.LOGICAL_ENV  }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           BUCKET: ${{ vars.BUCKET }}
           DYNAMODB_TABLE: ${{ vars.DYNAMODB_TABLE }}
