@@ -13,7 +13,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
 
 env:
-  MY_TEST_VAR: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
+  FULL_BRANCH_NAME: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
 
 permissions:
   contents: write
@@ -31,10 +31,7 @@ jobs:
 
       - name: Extract JIRA number from branch name
         run: |
-          BRANCH_NAME="${GITHUB_REF##*/}"
-          echo "Branch name is: $BRANCH_NAME"
-
-          JIRA_NUMBER=$(echo "$BRANCH_NAME" | grep -oE 'AM-[0-9]+')
+          JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+')
 
           echo "JIRA number is: $JIRA_NUMBER"
           echo "jira_number=$JIRA_NUMBER" >> $GITHUB_OUTPUT
