@@ -33,6 +33,11 @@ jobs:
         run: |
           JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+')
 
+          if [ -z "$JIRA_NUMBER" ]; then
+            echo "No JIRA number found, generating random environment name..."
+            JIRA_NUMBER="env-$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c $((RANDOM % 5 + 6)))"
+          fi
+
           echo "JIRA number is: $JIRA_NUMBER"
           echo "jira_number=$JIRA_NUMBER" >> $GITHUB_OUTPUT
         id: extract
