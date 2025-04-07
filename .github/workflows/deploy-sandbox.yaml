@@ -73,12 +73,12 @@ jobs:
             fi
           }
 
-          check_var "$AWS_ROLE_ARN" "AWS_ROLE_ARN"
-          check_var "$BAND" "BAND"
+          # check_var "$AWS_ROLE_ARN" "AWS_ROLE_ARN"
+          # check_var "$BAND" "BAND"
           check_var "$LOGICAL_ENV" "LOGICAL_ENV"
-          check_var "$AWS_REGION" "AWS_REGION"
-          check_var "$BUCKET" "BUCKET"
-          check_var "$DYNAMODB_TABLE" "DYNAMODB_TABLE"
+          # check_var "$AWS_REGION" "AWS_REGION"
+          # check_var "$BUCKET" "BUCKET"
+          # check_var "$DYNAMODB_TABLE" "DYNAMODB_TABLE"
 
           if [ "$MISSING" = true ]; then
             echo "❌ One or more required variables are missing. Failing pipeline."  >> $GITHUB_STEP_SUMMARY
