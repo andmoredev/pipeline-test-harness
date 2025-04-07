@@ -39,7 +39,7 @@ jobs:
         id: get-logical-environment-name
         run: |
           if [ "${{ inputs.environment || 'Temporary' }}" != "Temporary" ]; then
-            LOGICAL_ENV="${{ inputs.environment }}"
+            LOGICAL_ENV="${{ vars.LOGICAL_ENV }}"
             echo "Using provided environment: $LOGICAL_ENV"
           else
             JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
