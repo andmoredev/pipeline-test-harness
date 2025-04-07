@@ -12,7 +12,6 @@ on:
       environment:
           type: environment
           description: 'Select the Logical Environment'
-          required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
