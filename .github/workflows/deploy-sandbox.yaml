@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   get-logical-environment-name:
-    name: Get branch name
+    name: Get Logical Environment
     runs-on: ubuntu-latest
     outputs:
       LOGICAL_ENVIRONMENT_NAME: ${{ steps.get-logical-environment-name.outputs.LOGICAL_ENVIRONMENT_NAME }}
@@ -94,22 +94,22 @@ jobs:
       #     # gh pr review --approve "$PR_URL"
       #     # gh pr merge --auto --merge "$PR_URL"
 
-      - id: branch-name
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "var 0 $MY_TEST_VAR"
-          echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
-          echo "var 2 --- ${{ github.ref_name }}"
-          echo "var 3 ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}"
-          echo "var 4 ${{github.event.number}}"
-          REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
-          REPLACE_STRING="refs/heads/"
-          EMPTY_STRING=""
-          BRANCH_NAME=$(echo "PR-${{github.event.number}}")
+      # - id: branch-name
+      #   env:
+      #     GITHUB_CONTEXT: ${{ toJson(github) }}
+      #   run: |
+      #     echo "var 0 $MY_TEST_VAR"
+      #     echo "var 1 --- ${{ github.event.pull_request.head.ref }}"
+      #     echo "var 2 --- ${{ github.ref_name }}"
+      #     echo "var 3 ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}"
+      #     echo "var 4 ${{github.event.number}}"
+      #     REF_VALUE=$(echo "${{ github.event.ref || github.ref }}")
+      #     REPLACE_STRING="refs/heads/"
+      #     EMPTY_STRING=""
+      #     BRANCH_NAME=$(echo "PR-${{github.event.number}}")
 
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
+      #     echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+      #     echo "### Branch Name $BRANCH_NAME" >> $GITHUB_STEP_SUMMARY
 
   # review-and-merge:
   #   if: ${{ github.actor == 'dependabot[bot]' }}
