@@ -18,6 +18,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
 
 env:
+  JIRA_PREFIX: 'AM'
   FULL_BRANCH_NAME: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
 
 permissions:
@@ -28,8 +29,9 @@ jobs:
   get-logical-environment-name:
     name: Get Logical Environment
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'dev-1' }}
     outputs:
-      LOGICAL_ENVIRONMENT_NAME: ${{ steps.get-logical-environment-name.outputs.LOGICAL_ENVIRONMENT_NAME }}
+      LOGICAL_ENV: ${{ steps.get-logical-environment-name.outputs.LOGICAL_ENV }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,23 +40,52 @@ jobs:
         id: get-logical-environment-name
         run: |
           if [ "${{ inputs.environment || 'Temporary' }}" != "Temporary" ]; then
-            LOGICAL_ENVIRONMENT_NAME="${{ inputs.environment }}"
-            echo "Using provided environment: $LOGICAL_ENVIRONMENT_NAME"
+            LOGICAL_ENV="${{ vars.LOGICAL_ENV }}"
+            echo "Using provided environment: $LOGICAL_ENV"
           else
-            JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
+            JIRA_NUMBER=$(echo "${{ env.FULL_BRANCH_NAME }}" | grep -oE '${{ env.JIRA_PREFIX }}-[0-9]+' || true)
 
             if [ -z "$JIRA_NUMBER" ]; then
               echo "No JIRA number found, generating random environment name..."
               JIRA_NUMBER="env-$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c $((RANDOM % 4 + 3)))"
             fi
 
-            LOGICAL_ENVIRONMENT_NAME="$JIRA_NUMBER"
+            LOGICAL_ENV="$JIRA_NUMBER"
           fi
 
-          echo "LOGICAL_ENVIRONMENT_NAME=$LOGICAL_ENVIRONMENT_NAME" >> $GITHUB_OUTPUT
+          echo "LOGICAL_ENV=$LOGICAL_ENV" >> $GITHUB_ENV
           echo "# BUILD DATA" >> $GITHUB_STEP_SUMMARY
-          echo "* Logical Environment - $LOGICAL_ENVIRONMENT_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "* Logical Environment - $LOGICAL_ENV" >> $GITHUB_STEP_SUMMARY
 
+      - name: Check Required Variables
+        env:
+          AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+          BAND: ${{ vars.BAND }}
+          LOGICAL_ENV: ${{ env.LOGICAL_ENV  }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          BUCKET: ${{ vars.BUCKET }}
+          DYNAMODB_TABLE: ${{ vars.DYNAMODB_TABLE }}
+        run: |
+          MISSING=false
+
+          check_var() {
+            if [ -z "$1" ]; then
+              echo "❌ Missing required variable: $2" >> $GITHUB_STEP_SUMMARY
+              MISSING=true
+            fi
+          }
+
+          # check_var "$AWS_ROLE_ARN" "AWS_ROLE_ARN"
+          # check_var "$BAND" "BAND"
+          check_var "$LOGICAL_ENV" "LOGICAL_ENV"
+          # check_var "$AWS_REGION" "AWS_REGION"
+          # check_var "$BUCKET" "BUCKET"
+          # check_var "$DYNAMODB_TABLE" "DYNAMODB_TABLE"
+
+          if [ "$MISSING" = true ]; then
+            echo "❌ One or more required variables are missing. Failing pipeline."  >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
       # - name: Create Branch & Update File
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
