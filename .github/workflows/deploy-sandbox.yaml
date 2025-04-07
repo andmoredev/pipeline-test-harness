@@ -18,6 +18,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
 
 env:
+  JIRA_PREFIX: 'AM'
   FULL_BRANCH_NAME: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref  || github.event_name == 'delete' && github.event.ref }}
 
 permissions:
@@ -42,7 +43,7 @@ jobs:
             LOGICAL_ENV="${{ vars.LOGICAL_ENV }}"
             echo "Using provided environment: $LOGICAL_ENV"
           else
-            JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
+            JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE '$JIRA_PREFIX-[0-9]+' || true)
 
             if [ -z "$JIRA_NUMBER" ]; then
               echo "No JIRA number found, generating random environment name..."
