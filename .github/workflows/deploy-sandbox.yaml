@@ -26,7 +26,6 @@ permissions:
 
 jobs:
   get-logical-environment-name:
-    if: inputs.environment == 'Temporary'
     name: Get Logical Environment
     runs-on: ubuntu-latest
     outputs:
@@ -38,17 +37,23 @@ jobs:
       - name: Extract JIRA number from branch name
         id: get-logical-environment-name
         run: |
-          echo input - ${{ inputs.environment }}
-          JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
+          if [ "${{ inputs.environment || 'Temporary' }}" != "Temporary" ]; then
+            LOGICAL_ENVIRONMENT_NAME="${{ inputs.environment }}"
+            echo "Using provided environment: $LOGICAL_ENVIRONMENT_NAME"
+          else
+            JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE 'AM-[0-9]+' || true)
 
-          if [ -z "$JIRA_NUMBER" ]; then
-            echo "No JIRA number found, generating random environment name..."
-            JIRA_NUMBER="env-$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c $((RANDOM % 4 + 3)))"
+            if [ -z "$JIRA_NUMBER" ]; then
+              echo "No JIRA number found, generating random environment name..."
+              JIRA_NUMBER="env-$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c $((RANDOM % 4 + 3)))"
+            fi
+
+            LOGICAL_ENVIRONMENT_NAME="$JIRA_NUMBER"
           fi
 
-          echo "LOGICAL_ENVIRONMENT_NAME=$JIRA_NUMBER" >> $GITHUB_OUTPUT
+          echo "LOGICAL_ENVIRONMENT_NAME=$LOGICAL_ENVIRONMENT_NAME" >> $GITHUB_OUTPUT
           echo "# BUILD DATA" >> $GITHUB_STEP_SUMMARY
-          echo "* Logical Environment - $JIRA_NUMBER" >> $GITHUB_STEP_SUMMARY
+          echo "* Logical Environment - $LOGICAL_ENVIRONMENT_NAME" >> $GITHUB_STEP_SUMMARY
 
       # - name: Create Branch & Update File
       #   env:
