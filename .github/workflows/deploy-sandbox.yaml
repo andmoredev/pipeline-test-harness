@@ -55,6 +55,35 @@ jobs:
           echo "# BUILD DATA" >> $GITHUB_STEP_SUMMARY
           echo "* Logical Environment - $LOGICAL_ENVIRONMENT_NAME" >> $GITHUB_STEP_SUMMARY
 
+      - name: Check Required Variables
+        env:
+          AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+          BAND: ${{ vars.BAND }}
+          LOGICAL_ENV: ${{ vars.LOGICAL_ENV }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          BUCKET: ${{ vars.BUCKET }}
+          DYNAMODB_TABLE: ${{ vars.DYNAMODB_TABLE }}
+        run: |
+          MISSING=false
+
+          check_var() {
+            if [ -z "$1" ]; then
+              echo "❌ Missing required variable: $2" >> $GITHUB_STEP_SUMMARY
+              MISSING=true
+            fi
+          }
+
+          check_var "$AWS_ROLE_ARN" "AWS_ROLE_ARN"
+          check_var "$BAND" "BAND"
+          check_var "$LOGICAL_ENV" "LOGICAL_ENV"
+          check_var "$AWS_REGION" "AWS_REGION"
+          check_var "$BUCKET" "BUCKET"
+          check_var "$DYNAMODB_TABLE" "DYNAMODB_TABLE"
+
+          if [ "$MISSING" = true ]; then
+            echo "❌ One or more required variables are missing. Failing pipeline."  >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
       # - name: Create Branch & Update File
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
