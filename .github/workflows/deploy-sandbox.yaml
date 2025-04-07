@@ -38,6 +38,8 @@ jobs:
 
       - name: Get Logical Environment Name
         id: get-logical-environment-name
+        env:
+          JIRA_PREFIX: ${{ env.JIRA_PREFIX }}
         run: |
           if [ "${{ inputs.environment || 'Temporary' }}" != "Temporary" ]; then
             LOGICAL_ENV="${{ vars.LOGICAL_ENV }}"
