@@ -61,7 +61,7 @@ jobs:
         env:
           AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
           BAND: ${{ vars.BAND }}
-          LOGICAL_ENV: ${{ vars.LOGICAL_ENV || env.LOGICAL_ENV  }}
+          LOGICAL_ENV: ${{ env.LOGICAL_ENV  }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           BUCKET: ${{ vars.BUCKET }}
           DYNAMODB_TABLE: ${{ vars.DYNAMODB_TABLE }}
