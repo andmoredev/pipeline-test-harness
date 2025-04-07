@@ -43,7 +43,7 @@ jobs:
             LOGICAL_ENV="${{ vars.LOGICAL_ENV }}"
             echo "Using provided environment: $LOGICAL_ENV"
           else
-            JIRA_NUMBER=$(echo "$FULL_BRANCH_NAME" | grep -oE '${{ env.JIRA_PREFIX }}-[0-9]+' || true)
+            JIRA_NUMBER=$(echo "${{ env.FULL_BRANCH_NAME }}" | grep -oE '${{ env.JIRA_PREFIX }}-[0-9]+' || true)
 
             if [ -z "$JIRA_NUMBER" ]; then
               echo "No JIRA number found, generating random environment name..."
