@@ -6,8 +6,8 @@
   },
   "devDependencies": {
     "@types/fs-extra": "11.0.4",
-    "eslint": "^9.22.0",
+    "eslint": "^9.24.0",
     "eslint-config-google": "^0.14.0",
-    "sinon": "19.0.2"
+    "sinon": "20.0.0"
   }
 }
