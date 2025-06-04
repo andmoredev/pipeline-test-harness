@@ -27,3 +27,4 @@ Resources:
       CodeUri: functions/test-function-2
       Policies:
         - AWSLambdaBasicExecutionRole
+        
